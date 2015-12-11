@@ -1,0 +1,138 @@
+i=imread('C:\Animesh\Image Processing\images\images\lena.gif');
+%i=rgb2gray(a);
+i=imnoise(i,'Salt & Pepper',0.02);
+[rows,cols]=size(i);
+n=input('Enter the operation to be done:\n1. Average filter\n2. Weighted average\n3. Minimum\n4. Maximum\n5. Median\n');
+out=zeros(rows,cols,'double');
+wt=zeros(3,3);
+wt(1,1)=1;
+wt(1,2)=2;
+wt(1,3)=1;
+wt(2,1)=2;
+wt(2,2)=4;
+wt(2,3)=2;
+wt(3,1)=1;
+wt(3,2)=2;
+wt(3,3)=1;
+x=input('Enter the size of the filter matrix: ');
+l=floor(x/2);
+
+%average
+if(n==1)
+    for c = 1 : cols
+        for r = 1 : rows
+            if(c<=l || c >=cols-l || r<=l || r>=rows-l)
+                out(r,c)=i(r,c);
+                continue; 
+            end
+            for mx = c-l : c+l
+                for nx = r-l : r+l
+                    out(r,c) = out(r,c) + i(nx,mx)/(x*x);
+                end
+            end
+        end
+    end
+figure,imshow(uint8(i)),title('original');
+figure,imshow(uint8(out)),title('average');
+end
+
+%weighted average
+if(n==2)
+    for c = 1 : cols
+        for r = 1 : rows
+            if(c<=l || c >=cols-l || r<=l || r>=rows-l)
+                out(r,c)=i(r,c);
+                continue; 
+            end
+            j=1;
+            for mx = c-l : c+l
+                k=1;
+                for nx = r-l : r+l
+                    out(r,c) = out(r,c) + (wt(k,j)*i(nx,mx))/16;
+                    k=k+1;
+                end
+                j=j+1;
+            end
+            %out(r,c)=out(r,c)/16;
+        end
+    end
+figure,imshow(uint8(i)),title('original');
+figure,imshow(uint8(out)),title('weighted average');
+end
+
+%minimum
+if(n==3)
+    for c = 1 : cols
+        for r = 1 : rows
+            min=255;
+            if(c<=l || c >=cols-l || r<=l || r>=rows-l)
+                out(r,c)=i(r,c);
+                continue; 
+            end
+            for mx = c-l : c+l
+                for nx = r-l : r+l
+                    if (i(nx,mx)<min)
+                        min=i(nx,mx);
+                    end
+                end
+                out(r,c)=min;
+            end
+        end
+    end
+figure,imshow(uint8(i)),title('original');
+figure,imshow(uint8(out)),title('Minimum');
+end
+
+%maximum
+if(n==4)
+    for c = 1 : cols
+        for r = 1 : rows
+            max=0;
+            if(c<=l || c >=cols-l || r<=l || r>=rows-l)
+                out(r,c)=i(r,c);
+                continue; 
+            end
+            for mx = c-l : c+l
+                for nx = r-l : r+l
+                    if (i(nx,mx)>max)
+                        max=i(nx,mx);
+                    end
+                end
+                out(r,c)=max;
+            end
+        end
+    end
+figure,imshow(uint8(i)),title('original');
+figure,imshow(uint8(out)),title('Maximum');
+end
+
+%median
+z=x*x;
+arr=zeros(z);
+if(n==5)
+    for c = 1 : cols
+        for r = 1 : rows
+            if(c<=l || c >=cols-l || r<=l || r>=rows-l)
+                out(r,c)=i(r,c);
+                continue; 
+            end
+            count=1;
+            arr=0;
+            for mx = c-l : c+l
+                for nx = r-l : r+l
+                    arr(count)=i(nx,mx);
+                    count=count+1;
+                end
+            end
+            array=sort(arr);
+            if mod(x*x,2)==0
+                out(r,c)=array((x*x)/2);
+            end
+            if mod(x*x,2)==1
+                out(r,c)=array((x*x+1)/2);
+            end
+        end
+    end
+figure,imshow(uint8(i)),title('original');
+figure,imshow(uint8(out)),title('Median');
+end
